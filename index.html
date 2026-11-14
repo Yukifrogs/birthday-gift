@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>С Днём Рождения! 🎂 Страна Смешариков</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#5bc0eb; --sky:#bfe9ff; --orange:#ff9f1c; --green:#7ac74f;
+    --yellow:#ffd23f; --pink:#ff6b9d; --purple:#9b5de5; --dark:#2b2d42; --cream:#fff8e7;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Nunito',sans-serif; color:var(--dark);
+    background:linear-gradient(180deg,var(--sky) 0%, #e0f7ff 40%, var(--cream) 100%);
+    overflow-x:hidden; min-height:100vh;
+  }
+  h1,h2,h3{font-family:'Comfortaa',cursive;}
+
+  .clouds{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .cloud{position:absolute;background:rgba(255,255,255,.75);border-radius:50%;filter:blur(1px);animation:float linear infinite;}
+  .cloud::before,.cloud::after{content:'';position:absolute;background:inherit;border-radius:50%;}
+  .cloud::before{width:70%;height:120%;left:-20%;top:-30%;}
+  .cloud::after{width:60%;height:110%;right:-15%;top:-20%;}
+  @keyframes float{from{transform:translateX(-20vw);}to{transform:translateX(120vw);}}
+
+  header{position:relative;z-index:2;text-align:center;padding:50px 20px 20px;}
+  header h1{
+    font-size:clamp(1.8rem,5vw,3.2rem); color:var(--orange);
+    text-shadow:3px 3px 0 #fff,6px 6px 0 rgba(91,192,235,.35); letter-spacing:1px; cursor:pointer;
+  }
+  header p{margin-top:14px;font-size:clamp(.95rem,2.5vw,1.2rem);color:#476;}
+
+  main{position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:20px;}
+  section{margin:50px 0;}
+  .section-title{text-align:center;font-size:clamp(1.4rem,3.5vw,2rem);color:var(--purple);margin-bottom:25px;}
+  .section-title::after{content:'';display:block;width:80px;height:5px;background:var(--yellow);border-radius:5px;margin:10px auto 0;}
+
+  /* карта */
+  .map{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;}
+  .house{
+    background:#fff;border-radius:28px;padding:18px 10px;text-align:center;cursor:pointer;
+    border:4px solid transparent;box-shadow:0 8px 0 rgba(0,0,0,.08), 0 10px 25px rgba(0,0,0,.08);
+    transition:transform .25s, box-shadow .25s, border-color .25s;position:relative;
+  }
+  /* Картинки персонажей */
+.char-img{
+  display:block;
+  margin:0 auto;
+  object-fit:contain;
+  transition:transform .3s;
+  user-select:none;
+  pointer-events:none;
+}
+/* на домике карты */
+.char-img-house{
+  width:70px;
+  height:70px;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.15));
+}
+.house:hover .char-img-house{
+  transform:scale(1.15) rotate(6deg);
+}
+/* в модалке */
+.char-img-modal{
+  width:120px;
+  height:120px;
+  margin-bottom:6px;
+  filter:drop-shadow(0 6px 12px rgba(0,0,0,.2));
+}
+/* в результате теста */
+.char-img-result{
+  width:140px;
+  height:140px;
+  margin:0 auto;
+  animation:pop .5s;
+  filter:drop-shadow(0 6px 12px rgba(0,0,0,.2));
+}
+
+/* адаптив */
+@media(max-width:480px){
+  .char-img-house{width:56px;height:56px;}
+  .char-img-modal{width:96px;height:96px;}
+  .char-img-result{width:110px;height:110px;}
+}
+  .house:hover{transform:translateY(-6px) rotate(-1.5deg);}
+  .house.opened{border-color:var(--green);}
+  .house .emoji{font-size:2.8rem;display:block;transition:transform .3s;}
+  .house:hover .emoji{transform:scale(1.15) rotate(6deg);}
+  .house .name{font-family:'Comfortaa';font-weight:700;margin-top:8px;font-size:1rem;}
+  .house .tag{font-size:.75rem;color:#889;margin-top:4px;}
+  .house .check{position:absolute;top:10px;right:12px;font-size:1.1rem;opacity:0;transition:opacity .3s;}
+  .house.opened .check{opacity:1;}
+
+  .progress-wrap{max-width:420px;margin:25px auto 0;background:#fff;border-radius:20px;padding:10px 16px;box-shadow:0 6px 0 rgba(0,0,0,.06);font-weight:700;text-align:center;color:#567;}
+  .progress-bar{height:14px;background:#eef3f7;border-radius:10px;margin-top:8px;overflow:hidden;}
+  .progress-fill{height:100%;width:0;border-radius:10px;background:linear-gradient(90deg,var(--green),var(--yellow),var(--orange));transition:width .5s ease;}
+
+  /* модалка */
+  .modal-back{position:fixed;inset:0;background:rgba(20,30,50,.55);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .3s;}
+  .modal-back.show{opacity:1;pointer-events:auto;}
+  .modal{
+    background:var(--cream);border-radius:30px;max-width:520px;width:100%;padding:30px 26px;position:relative;text-align:center;
+    transform:scale(.85);transition:transform .3s;border:6px solid #fff;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:85vh;overflow-y:auto;
+  }
+  .modal-back.show .modal{transform:scale(1);}
+  .modal .big-emoji{font-size:4rem;display:block;margin-bottom:10px;}
+  .modal h3{font-size:1.6rem;color:var(--orange);margin-bottom:12px;}
+  .modal p{line-height:1.6;font-size:1.02rem;color:#3a4152;}
+  .modal .close{position:absolute;top:12px;right:16px;font-size:1.6rem;border:none;background:none;cursor:pointer;color:#aab;transition:transform .2s,color .2s;}
+  .modal .close:hover{color:var(--pink);transform:rotate(90deg);}
+
+  /* тест */
+  .quiz{background:#fff;border-radius:30px;padding:26px;box-shadow:0 10px 0 rgba(0,0,0,.06),0 15px 40px rgba(0,0,0,.08);max-width:640px;margin:0 auto;}
+  .quiz .q{font-family:'Comfortaa';font-size:1.15rem;margin-bottom:18px;color:var(--dark);}
+  .quiz .answers{display:grid;gap:10px;}
+  .quiz button.ans{
+    text-align:left;padding:14px 18px;border-radius:18px;border:3px solid #eef3f7;background:#fafdff;
+    font-family:'Nunito';font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;color:var(--dark);
+  }
+  .quiz button.ans:hover{border-color:var(--blue);background:#eaf7ff;transform:translateX(4px);}
+  .quiz .progress{font-size:.85rem;color:#9aa;margin-bottom:10px;text-align:right;}
+  .quiz-result{text-align:center;}
+  .quiz-result .big-emoji{font-size:5rem;animation:pop .5s;}
+  @keyframes pop{0%{transform:scale(0);}70%{transform:scale(1.2);}100%{transform:scale(1);}}
+  .quiz-result h3{color:var(--pink);font-size:1.7rem;margin:10px 0;}
+  .quiz-result p{line-height:1.6;margin-bottom:18px;}
+
+  .btn{
+    display:inline-block;padding:13px 28px;border-radius:30px;border:none;
+    font-family:'Comfortaa';font-weight:700;font-size:1rem;cursor:pointer;
+    background:linear-gradient(135deg,var(--orange),var(--pink));color:#fff;
+    box-shadow:0 6px 0 rgba(0,0,0,.15);transition:transform .15s,box-shadow .15s;
+  }
+  .btn:hover{transform:translateY(-2px);box-shadow:0 8px 0 rgba(0,0,0,.15);}
+  .btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.15);}
+  .btn.green{background:linear-gradient(135deg,var(--green),#4fa52f);}
+  .btn.purple{background:linear-gradient(135deg,var(--purple),#7a3fd1);}
+  .btn.small{padding:10px 18px;font-size:.9rem;}
+
+  /* галерея */
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;}
+  .gallery .cell{
+    aspect-ratio:1;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    background:#fff;box-shadow:0 6px 0 rgba(0,0,0,.06);font-size:2rem;cursor:pointer;
+    transition:transform .25s,background .25s;border:3px solid transparent;position:relative;overflow:hidden;
+  }
+  .gallery .cell:hover{transform:scale(1.06) rotate(2deg);border-color:var(--yellow);}
+  .gallery .cell span.cap{font-size:.7rem;color:#889;font-family:'Nunito';font-weight:700;text-align:center;padding:0 4px;}
+  .gallery .cell img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+
+  /* генератор */
+  .oracle{background:linear-gradient(135deg,#fff6d6,#ffe9f2);border-radius:30px;padding:30px;max-width:560px;margin:0 auto;text-align:center;box-shadow:0 10px 0 rgba(0,0,0,.06);}
+  .oracle .bubble{background:#fff;border-radius:24px;padding:20px;min-height:100px;display:flex;align-items:center;justify-content:center;font-size:1.05rem;line-height:1.5;margin:16px 0;font-weight:700;color:#3a4152;box-shadow:inset 0 -4px 0 rgba(0,0,0,.04);}
+
+  /* таймер */
+  .timer{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+  .timer .unit{background:#fff;border-radius:20px;padding:16px 20px;min-width:90px;text-align:center;box-shadow:0 6px 0 rgba(0,0,0,.06);}
+  .timer .num{font-family:'Comfortaa';font-size:1.8rem;font-weight:700;color:var(--orange);}
+  .timer .lbl{font-size:.75rem;color:#889;text-transform:uppercase;letter-spacing:1px;}
+
+  /* гостевая */
+  .guestbook{background:#fff;border-radius:30px;padding:26px;max-width:640px;margin:0 auto;box-shadow:0 10px 0 rgba(0,0,0,.06);}
+  .guestbook .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+  .guestbook input,.guestbook textarea{
+    font-family:'Nunito';font-size:1rem;padding:12px 16px;border-radius:18px;
+    border:3px solid #eef3f7;background:#fafdff;outline:none;transition:border-color .2s;width:100%;
+  }
+  .guestbook input:focus,.guestbook textarea:focus{border-color:var(--blue);}
+  .guestbook textarea{min-height:80px;resize:vertical;}
+  .guestbook .row input{flex:1;min-width:160px;}
+  .entries{display:grid;gap:12px;margin-top:18px;max-height:400px;overflow-y:auto;}
+  .entry{background:#fafdff;border-radius:18px;padding:14px 18px;border-left:5px solid var(--yellow);}
+  .entry .who{font-weight:900;color:var(--orange);font-size:.95rem;}
+  .entry .when{font-size:.75rem;color:#aab;margin-left:8px;font-weight:400;}
+  .entry .txt{margin-top:6px;line-height:1.5;color:#3a4152;}
+
+  /* финал */
+  .final{text-align:center;background:linear-gradient(135deg,#fff,#ffe9f2,#e6f7ff);border-radius:36px;padding:40px 24px;margin:60px auto 80px;max-width:700px;box-shadow:0 15px 0 rgba(0,0,0,.05),0 20px 60px rgba(0,0,0,.1);}
+  .cake{font-size:clamp(4rem,12vw,7rem);display:inline-block;animation:sway 2.5s ease-in-out infinite;}
+  @keyframes sway{0%,100%{transform:rotate(-4deg);}50%{transform:rotate(4deg);}}
+  .final h2{color:var(--pink);font-size:clamp(1.6rem,4.5vw,2.6rem);margin:14px 0;}
+  .final p{font-size:1.1rem;line-height:1.6;color:#3a4152;margin-bottom:22px;}
+
+  #confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:200;}
+
+  .toast{
+    position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(120px);
+    background:var(--dark);color:#fff;padding:14px 24px;border-radius:20px;font-weight:700;
+    z-index:300;transition:transform .4s;box-shadow:0 10px 30px rgba(0,0,0,.3);max-width:90vw;text-align:center;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+
+  /* музыка */
+  .music-btn{
+    position:fixed;bottom:20px;right:20px;z-index:250;width:56px;height:56px;border-radius:50%;
+    border:none;cursor:pointer;font-size:1.5rem;background:#fff;box-shadow:0 6px 0 rgba(0,0,0,.12),0 10px 25px rgba(0,0,0,.15);
+    transition:transform .2s;
+  }
+  .music-btn:hover{transform:scale(1.1);}
+  .music-btn.playing{background:var(--green);color:#fff;}
+
+  footer{text-align:center;padding:20px;color:#9aa;font-size:.85rem;position:relative;z-index:2;}
+
+  @media(max-width:480px){
+    .map{grid-template-columns:repeat(2,1fr);gap:10px;}
+    .house{padding:14px 6px;border-radius:22px;}
+    .house .emoji{font-size:2.2rem;}
+    .quiz{padding:20px;}
+    .timer .unit{min-width:70px;padding:12px 10px;}
+    .timer .num{font-size:1.4rem;}
+    .gallery{grid-template-columns:repeat(2,1fr);}
+  }
+  
+ 
+
+#bdayMessage{
+  animation:softGlow 2.5s ease-in-out infinite;
+}
+@keyframes softGlow{
+  0%,100%{opacity:.75;}
+  50%{opacity:1;}
+}
+
+@media(max-width:480px){
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .stat-card{padding:16px 10px;border-radius:18px;}
+  .stat-card .stat-emoji{font-size:1.9rem;}
+  .stat-card .stat-num{font-size:1.4rem;}
+  .stat-card .stat-lbl{font-size:.75rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="clouds" id="clouds"></div>
+
+<header>
+  <h1 id="logo">🌈 Страна Смешариков 🌈</h1>
+  <p>Специальный выпуск ко дню рождения лучшей подруги 💛</p>
+</header>
+
+<main>
+
+  <!-- КАРТА -->
+  <section id="map-section">
+    <h2 class="section-title">Карта Страны</h2>
+    <div class="map" id="map"></div>
+    <div class="progress-wrap">
+      Открыто домиков: <span id="openedCount">0</span> / <span id="totalCount">9</span>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </section>
+
+  <!-- ТЕСТ -->
+  <section id="quiz-section">
+    <h2 class="section-title">Кто ты из Смешариков?</h2>
+    <div class="quiz" id="quiz">
+      <div class="progress" id="quizProgress"></div>
+      <div id="quizBody"></div>
+    </div>
+  </section>
+
+  <!-- ГАЛЕРЕЯ -->
+  <section id="gallery-section">
+    <h2 class="section-title">20 лет — 20 моментов</h2>
+    <div class="gallery" id="gallery"></div>
+    
+  </section>
+
+  <!-- ГОСТЕВАЯ -->
+  <section id="guestbook-section">
+    <h2 class="section-title">Гостевая книга поздравлений</h2>
+    <div class="guestbook">
+      <div class="row">
+        <input type="text" id="gbName" placeholder="Твоё имя" maxlength="40" />
+      </div>
+      <div class="row">
+        <textarea id="gbText" placeholder="Напиши поздравление для именинницы..." maxlength="500"></textarea>
+      </div>
+      <button class="btn green small" id="gbSubmit">Отправить поздравление 💌</button>
+      <p style="font-size:.8rem;color:#aab;margin-top:10px;">
+        Сообщения сохраняются в этом браузере. Для общего доступа нужен Firebase (см. комментарий в коде).
+      </p>
+      <div class="entries" id="gbEntries"></div>
+    </div>
+  </section>
+
+  <!-- ГЕНЕРАТОР -->
+  <section id="oracle-section">
+    <h2 class="section-title">Совунья нагадала…</h2>
+    <div class="oracle">
+      <div style="font-size:3rem;">🦉</div>
+      <div class="bubble" id="oracleText">Нажми на кнопку — и узнаешь, что тебя ждёт!</div>
+      <button class="btn purple" id="oracleBtn">Получить пожелание ✨</button>
+    </div>
+  </section>
+
+  <!-- ОБРАТНЫЙ ОТСЧЁТ ДО ДР -->
+<section id="birthday-section">
+  <h2 class="section-title">До твоего следующего Дня Рождения осталось…</h2>
+  <div class="timer" id="birthdayTimer">
+    <div class="unit"><div class="num" id="bDays">0</div><div class="lbl">дней</div></div>
+    <div class="unit"><div class="num" id="bHours">0</div><div class="lbl">часов</div></div>
+    <div class="unit"><div class="num" id="bMin">0</div><div class="lbl">минут</div></div>
+    <div class="unit"><div class="num" id="bSec">0</div><div class="lbl">секунд</div></div>
+  </div>
+  <p id="bdayMessage" style="text-align:center;margin-top:16px;color:#7a3fd1;font-weight:700;font-size:1.05rem;"></p>
+</section>
+
+  <!-- ФИНАЛ -->
+  <section class="final" id="final">
+    <div class="cake">🎂</div>
+    <h2>С Днём Рождения, подруга!</h2>
+    <p>20 лет — это только начало! Пусть каждый день будет как приключение в Стране Смешариков: ярким, добрым и полным друзей. Спасибо, что ты есть. 💛</p>
+    <button class="btn green" id="celebrateBtn">Задуть свечи и загадать желание 🕯️</button>
+  </section>
+
+</main>
+
+<footer>Сделано с любовью для тебя 💛</footer>
+
+<!-- модалка -->
+<div class="modal-back" id="modalBack">
+  <div class="modal">
+    <button class="close" id="modalClose">×</button>
+    <span class="big-emoji" id="modalEmoji">🎈</span>
+    <h3 id="modalTitle">Заголовок</h3>
+    <p id="modalText">Текст</p>
+  </div>
+</div>
+
+<!-- музыка -->
+<button class="music-btn" id="musicBtn" title="Включить/выключить музыку">🎵</button>
+<audio id="bgMusic" loop preload="auto">
+  <!-- ЗАМЕНИ src НА СВОЙ ФАЙЛ: положи music.mp3 рядом с index.html -->
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="confettiCanvas"></canvas>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   1) ВСЕ 9 СМЕШАРИКОВ — МЕНЯЙ ТЕКСТЫ ПОД СЕБЯ!
+   ============================================================ */
+const characters = [
+  {
+    id:'krosh', emoji:'🐰', img:'img/крош.png', name:'Крош', tag:'энергия и смех',
+    title:'Крош бы сказал…',
+    text:'«Ты как я — вечно в движении! Пусть в 20 лет каждый день будет новым приключением: прыгай выше, смейся громче, пробуй то, что страшно. И помни: лучшие идеи приходят в голову, когда совсем не до сна 😄»'
+  },
+  {
+    id:'ezhik', emoji:'🦔', img:'img/ёжик.png', name:'Ёжик', tag:'забота и тишина',
+    title:'Ёжик бы сказал…',
+    text:'«Ты умеешь создавать уют там, где ты есть. Пусть в твоём доме всегда пахнет выпечкой, в чате — тёплыми сообщениями, а в жизни — спокойствием. И чтобы всегда было кому сказать: «Я рядом» 🌿»'
+  },
+  {
+    id:'nyusha', emoji:'🐷', img:'img/нюша.png', name:'Нюша', tag:'красота и мечты',
+    title:'Нюша бы сказала…',
+    text:'«Милая, ты достойна самого лучшего! В 20 лет — сиять, влюбляться, выбирать себя. Пусть зеркало всегда говорит комплименты, а мечты сбываются быстрее, чем ты успеешь их загадать 💖»'
+  },
+  {
+    id:'barash', emoji:'🐑', img:'img/бараш.png', name:'Бараш', tag:'творчество и чувства',
+    title:'Бараш бы сказал…',
+    text:'«В 20 лет душа особенно тонкая — пиши, рисуй, чувствуй! Пусть вдохновение приходит по ночам, а строки складываются сами. И пусть найдётся тот, кто поймёт твои стихи без слов 📝»'
+  },
+  {
+    id:'losyash', emoji:'🦌', img:'img/лосяш.png', name:'Лосяш', tag:'наука и эрудиция',
+    title:'Лосяш бы сказал…',
+    text:'«Феноменально! В 20 лет самое время узнать что-то новое — но не забывай отдыхать между книгами. Пусть твоя библиотека растёт, а любопытство никогда не заканчивается. И да, бутерброды с колбасой — это тоже наука 🥪»'
+  },
+  {
+    id:'kopatych', emoji:'🐻', img:'img/копатыч.png', name:'Копатыч', tag:'надёжность и доброта',
+    title:'Копатыч бы сказал…',
+    text:'«Ты — человек, на которого всегда можно положиться. Пусть и у тебя будет такая же опора: друзья, семья, любимое дело. И мёд. Много мёда. Ну или шоколада — по вкусу 🍯»'
+  },
+  {
+    id:'sovunya', emoji:'🦉', img:'img/совунья.png', name:'Совунья', tag:'мудрость и уют',
+    title:'Совунья бы сказала…',
+    text:'«Дорогая, главное — вовремя пить чай и не забывать отдыхать! 20 лет — это время учиться, но не забывай про себя. Пусть в жизни будет баланс: работа, друзья, сон и вкусняшки. На пять с плюсом! 🍵»'
+  },
+  {
+    id:'pin', emoji:'🐧', img:'img/пин.png', name:'Пин', tag:'изобретательность',
+    title:'Пин бы сказал…',
+    text:'«О майн готт! В 20 лет ты — как мой лучший проект: всё ещё в разработке, но уже фантастишно! Пусть идеи приходят чаще, чем поломки, а рядом всегда будет кто-то вроде Биби — верный и надёжный 🤖»'
+  },
+  {
+    id:'karrych', emoji:'🦅', img:'img/карыч.png', name:'Кар-Карыч', tag:'артистизм и опыт',
+    title:'Кар-Карыч бы сказал…',
+    text:'«Ах, молодость! Я тоже когда-то блистал на арене… В 20 лет — самое время для больших сцен и смелых выходов. Пусть твоя жизнь будет похожа на хорошее представление: ярко, с музыкой и аплодисментами! 🎭»'
+  },
+];
+// Рендер картинки персонажа с fallback на эмодзи
+function renderCharImage(ch, size){
+  if(ch.img){
+    return `<img src="${ch.img}" alt="${ch.name}"
+      class="char-img char-img-${size}"
+      onerror="this.replaceWith(document.createTextNode('${ch.emoji}'))">`;
+  }
+  return ch.emoji;
+}
+/* ============================================================
+   2) ГЕНЕРАТОР ПОЖЕЛАНИЙ
+   ============================================================ */
+const wishes = [
+  'Пусть каждый день приносит повод для улыбки, даже если это просто вкусный кофе ☕',
+  'Желаю тебе людей, рядом с которыми можно быть собой — без фильтров и масок 🌟',
+  'Пусть в 20 лет сбудутся хотя бы 3 мечты из 10. Остальные — в 21! 🎯',
+  'Чтобы работа была в радость, а отдых — в удовольствие 🏖️',
+  'Пусть удача идёт за тобой по пятам, а проблемы — убегают 🍀',
+  'Желаю тебе путешествий, которые меняют взгляд на мир ✈️',
+  'Пусть любимые люди будут здоровы, а ты — счастлива 💛',
+  'Чтобы ты всегда находила время на «побаловать себя» 🍰',
+  'Пусть в твоей жизни будет больше спонтанных «да» и меньше «надо» 💫',
+  'Желаю тебе смелости пробовать новое и не бояться ошибаться 🚀',
+  'Пусть каждый твой день будет чуточку лучше предыдущего 📈',
+  'Чтобы ты чаще слышала «ты классная» — и это было правдой! 💖',
+  'Желаю тебе крепкого сна, вкусной еды и хорошей компании каждый день 🛌',
+  'Пусть в жизни будет место и для уюта, и для приключений 🏕️',
+  'Чтобы ты всегда знала: ты — справляешься, даже когда кажется, что нет 💪',
+];
+
+/* ============================================================
+   3) ОБЛАКА
+   ============================================================ */
+(function makeClouds(){
+  const wrap = document.getElementById('clouds');
+  for(let i=0;i<8;i++){
+    const c = document.createElement('div');
+    c.className='cloud';
+    const w = 80 + Math.random()*140;
+    c.style.width = w+'px';
+    c.style.height = (w*0.55)+'px';
+    c.style.top = (Math.random()*80)+'vh';
+    c.style.opacity = 0.4 + Math.random()*0.5;
+    c.style.animationDuration = (25 + Math.random()*35)+'s';
+    c.style.animationDelay = (-Math.random()*40)+'s';
+    wrap.appendChild(c);
+  }
+})();
+
+/* ============================================================
+   4) КАРТА ДОМИКОВ
+   ============================================================ */
+const mapEl = document.getElementById('map');
+const opened = new Set();
+
+characters.forEach(ch=>{
+  const d = document.createElement('div');
+  d.className='house';
+  d.dataset.id = ch.id;
+  d.innerHTML = `
+  <span class="check">✅</span>
+  <span class="emoji">${renderCharImage(ch, 'house')}</span>
+  <div class="name">${ch.name}</div>
+  <div class="tag">${ch.tag}</div>
+`;
+d.addEventListener('click', ()=>{
+  openModal(ch, ch.title, ch.text);   // передаём весь объект
+    if(!opened.has(ch.id)){
+      opened.add(ch.id);
+      d.classList.add('opened');
+      updateProgress();
+    }
+  });
+  mapEl.appendChild(d);
+});
+document.getElementById('totalCount').textContent = characters.length;
+
+function updateProgress(){
+  const n = opened.size, total = characters.length;
+  document.getElementById('openedCount').textContent = n;
+  document.getElementById('progressFill').style.width = (n/total*100)+'%';
+  if(n === total){
+    showToast('Ты открыла все домики! 🎉 Теперь пройди тест и задуй свечи!');
+  }
+}
+
+/* ============================================================
+   5) МОДАЛКА
+   ============================================================ */
+const modalBack = document.getElementById('modalBack');
+const modalEmoji = document.getElementById('modalEmoji');
+const modalTitle = document.getElementById('modalTitle');
+const modalText  = document.getElementById('modalText');
+const modalClose = document.getElementById('modalClose');
+
+function openModal(chOrEmoji, title, text){
+  // поддержка старого вызова с эмодзи
+  if(typeof chOrEmoji === 'string'){
+    modalEmoji.innerHTML = chOrEmoji;
+  }else{
+    modalEmoji.innerHTML = renderCharImage(chOrEmoji, 'modal');
+  }
+  modalTitle.textContent = title;
+  modalText.textContent  = text;
+  modalBack.classList.add('show');
+}
+function closeModal(){ modalBack.classList.remove('show'); }
+
+modalClose.addEventListener('click', closeModal);
+modalBack.addEventListener('click', e=>{ if(e.target===modalBack) closeModal(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+
+/* ============================================================
+   6) ТЕСТ — 6 вопросов, все 9 персонажей
+   ============================================================ */
+const quizData = [
+  {
+    q:'Как ты обычно начинаешь утро?',
+    a:[
+      {t:'Вскакиваю и сразу куда-то бегу!', s:'krosh'},
+      {t:'Проверяю, хорошо ли я выгляжу', s:'nyusha'},
+      {t:'Чай, плед и неспешные мысли', s:'sovunya'},
+      {t:'Планирую день и дела', s:'kopatych'},
+      {t:'Записываю сон/идею в блокнот', s:'barash'},
+      {t:'Тихо, спокойно, без суеты', s:'ezhik'},
+      {t:'Читаю что-то новое за завтраком', s:'losyash'},
+      {t:'Проверяю, всё ли работает', s:'pin'},
+      {t:'Напеваю вчерашнюю мелодию', s:'karrych'},
+    ]
+  },
+  {
+    q:'Что для тебя идеальный вечер?',
+    a:[
+      {t:'Тусовка с друзьями до утра', s:'krosh'},
+      {t:'Красивый ужин и комплименты', s:'nyusha'},
+      {t:'Книга, чай и тишина', s:'sovunya'},
+      {t:'Что-то полезное по дому/даче', s:'kopatych'},
+      {t:'Творчество: музыка, стихи, рисование', s:'barash'},
+      {t:'Плед, сериал, никого не трогать', s:'ezhik'},
+      {t:'Разобраться в сложной теме', s:'losyash'},
+      {t:'Что-нибудь починить или собрать', s:'pin'},
+      {t:'Посмотреть хорошее выступление', s:'karrych'},
+    ]
+  },
+  {
+    q:'Как ты реагируешь на проблемы?',
+    a:[
+      {t:'Смеюсь и иду напролом', s:'krosh'},
+      {t:'Сначала эмоции, потом решение', s:'nyusha'},
+      {t:'Спокойно анализирую', s:'sovunya'},
+      {t:'Беру ответственность и решаю', s:'kopatych'},
+      {t:'Пишу об этом стих или пост', s:'barash'},
+      {t:'Ухожу в себя, потом возвращаюсь', s:'ezhik'},
+      {t:'Ищу информацию и разбираюсь', s:'losyash'},
+      {t:'Пробую решить технически', s:'pin'},
+      {t:'Вспоминаю, как справлялся раньше', s:'karrych'},
+    ]
+  },
+  {
+    q:'Что тебя больше всего радует?',
+    a:[
+      {t:'Новые впечатления и движ', s:'krosh'},
+      {t:'Внимание и восхищение', s:'nyusha'},
+      {t:'Гармония и порядок в душе', s:'sovunya'},
+      {t:'Результат своего труда', s:'kopatych'},
+      {t:'Красота в мелочах', s:'barash'},
+      {t:'Уют и близкие рядом', s:'ezhik'},
+      {t:'Открытие или новая идея', s:'losyash'},
+      {t:'Работающий механизм', s:'pin'},
+      {t:'Хорошая история или песня', s:'karrych'},
+    ]
+  },
+  {
+    q:'Твой девиз по жизни?',
+    a:[
+      {t:'«Погнали!»', s:'krosh'},
+      {t:'«Я достойна лучшего»', s:'nyusha'},
+      {t:'«Всё будет хорошо»', s:'sovunya'},
+      {t:'«Сделай и не ной»', s:'kopatych'},
+      {t:'«Чувствуй сердцем»', s:'barash'},
+      {t:'«Тише едешь — дальше будешь»', s:'ezhik'},
+      {t:'«Феноменально!»', s:'losyash'},
+      {t:'«О майн готт!»', s:'pin'},
+      {t:'«Я ещё покажу!»', s:'karrych'},
+    ]
+  },
+  {
+    q:'Что бы ты взяла с собой на необитаемый остров?',
+    a:[
+      {t:'Мяч и хорошее настроение', s:'krosh'},
+      {t:'Зеркало и косметичку', s:'nyusha'},
+      {t:'Аптечку и плед', s:'sovunya'},
+      {t:'Семена и инструменты', s:'kopatych'},
+      {t:'Блокнот и ручку', s:'barash'},
+      {t:'Коллекцию фантиков', s:'ezhik'},
+      {t:'Энциклопедию', s:'losyash'},
+      {t:'Мультитул и запас деталей', s:'pin'},
+      {t:'Гитару и сборник анекдотов', s:'karrych'},
+    ]
+  },
+];
+
+const quizBody = document.getElementById('quizBody');
+const quizProgress = document.getElementById('quizProgress');
+let qIndex = 0;
+const scores = {};
+characters.forEach(c=>scores[c.id]=0);
+
+function renderQuestion(){
+  if(qIndex >= quizData.length){ renderQuizResult(); return; }
+  const item = quizData[qIndex];
+  quizProgress.textContent = `Вопрос ${qIndex+1} из ${quizData.length}`;
+  quizBody.innerHTML = `
+    <div class="q">${item.q}</div>
+    <div class="answers" id="answers"></div>
+  `;
+  const ansWrap = document.getElementById('answers');
+  item.a.forEach(a=>{
+    const b = document.createElement('button');
+    b.className='ans';
+    b.textContent = a.t;
+    b.addEventListener('click', ()=>{
+      scores[a.s]++;
+      qIndex++;
+      renderQuestion();
+    });
+    ansWrap.appendChild(b);
+  });
+}
+
+function renderQuizResult(){
+  quizProgress.textContent = '';
+  let best = characters[0].id, bestScore = -1;
+  for(const k in scores){ if(scores[k] > bestScore){ bestScore = scores[k]; best = k; } }
+  const ch = characters.find(c=>c.id===best);
+  quizBody.innerHTML = `
+    <div class="quiz-result">
+     <div class="big-emoji">${renderCharImage(ch, 'result')}</div>
+      <h3>Ты — ${ch.name}!</h3>
+      <p>${ch.text}</p>
+      <button class="btn" id="restartQuiz">Пройти ещё раз 🔄</button>
+    </div>
+  `;
+  document.getElementById('restartQuiz').addEventListener('click', ()=>{
+    qIndex = 0;
+    for(const k in scores) scores[k]=0;
+    renderQuestion();
+  });
+}
+renderQuestion();
+
+/* ============================================================
+   7) ГАЛЕРЕЯ
+   ============================================================ */
+const galleryItems = [
+  {img:'img/1.jpg', cap:'первый день'}, {emoji:'🍕', cap:'наша пицца'},
+  {emoji:'🌊', cap:'море'}, {emoji:'🎬', cap:'кино до утра'},
+  {emoji:'🎂', cap:'прошлый ДР'}, {emoji:'🎧', cap:'одна музыка'},
+  {emoji:'🌙', cap:'ночные разговоры'}, {emoji:'☕', cap:'кофе и болтовня'},
+  {emoji:'🧣', cap:'зима'}, {emoji:'🌸', cap:'весна'},
+  {emoji:'🏔️', cap:'поездка'}, {emoji:'📸', cap:'фото без повода'},
+  {emoji:'🎮', cap:'игры'}, {emoji:'🍰', cap:'тортики'},
+  {emoji:'👗', cap:'шопинг'}, {emoji:'🎤', cap:'караоке'},
+  {emoji:'🌟', cap:'мечты'}, {emoji:'💌', cap:'переписки'},
+  {emoji:'🤍', cap:'просто мы'}, {emoji:'🥳', cap:'20 лет!'},
+];
+
+const galleryEl = document.getElementById('gallery');
+galleryItems.forEach(item=>{
+  const cell = document.createElement('div');
+  cell.className='cell';
+  if(item.img){
+    cell.innerHTML = `<img src="${item.img}" alt="${item.cap}"><span class="cap" style="position:relative;z-index:2;color:#fff;text-shadow:0 1px 4px #000;margin-top:auto;">${item.cap}</span>`;
+    cell.style.position='relative';
+  }else{
+    cell.innerHTML = `<span>${item.emoji}</span><span class="cap">${item.cap}</span>`;
+  }
+  cell.addEventListener('click', ()=>{
+    showToast(item.img ? `«${item.cap}» 💛` : `${item.emoji} ${item.cap}`);
+  });
+  galleryEl.appendChild(cell);
+});
+
+/* ============================================================
+   8) ГОСТЕВАЯ КНИГА (localStorage)
+   ДЛЯ ОБЩЕГО ДОСТУПА: замени на Firebase Firestore.
+   Инструкция: https://firebase.google.com/codelabs/firebase-get-to-know-web
+   ============================================================ */
+const GB_KEY = 'smeshariki_guestbook_v1';
+const gbEntries = document.getElementById('gbEntries');
+const gbName = document.getElementById('gbName');
+const gbText = document.getElementById('gbText');
+const gbSubmit = document.getElementById('gbSubmit');
+
+function loadGuestbook(){
+  const raw = localStorage.getItem(GB_KEY);
+  let list = [];
+  try { list = raw ? JSON.parse(raw) : []; } catch(e){ list = []; }
+  return list;
+}
+function saveGuestbook(list){
+  localStorage.setItem(GB_KEY, JSON.stringify(list));
+}
+function renderGuestbook(){
+  const list = loadGuestbook();
+  if(list.length === 0){
+    gbEntries.innerHTML = '<p style="color:#aab;text-align:center;font-size:.9rem;">Пока никто не поздравил. Будь первой! 💛</p>';
+    return;
+  }
+  gbEntries.innerHTML = '';
+  list.forEach(item=>{
+    const d = document.createElement('div');
+    d.className = 'entry';
+    const date = new Date(item.ts).toLocaleString('ru-RU', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    d.innerHTML = `<div class="who">${escapeHtml(item.name)}<span class="when">${date}</span></div>
+                   <div class="txt">${escapeHtml(item.text)}</div>`;
+    gbEntries.appendChild(d);
+  });
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+gbSubmit.addEventListener('click', ()=>{
+  const name = gbName.value.trim();
+  const text = gbText.value.trim();
+  if(!name || !text){
+    showToast('Заполни имя и поздравление 🙏');
+    return;
+  }
+  const list = loadGuestbook();
+  list.unshift({ name, text, ts: Date.now() });
+  saveGuestbook(list);
+  gbName.value = '';
+  gbText.value = '';
+  renderGuestbook();
+  burstConfetti(40);
+  showToast('Поздравление добавлено! 💌');
+});
+renderGuestbook();
+
+/* ============================================================
+   9) ГЕНЕРАТОР ПОЖЕЛАНИЙ
+   ============================================================ */
+const oracleText = document.getElementById('oracleText');
+const oracleBtn = document.getElementById('oracleBtn');
+let lastWish = -1;
+oracleBtn.addEventListener('click', ()=>{
+  let i;
+  do { i = Math.floor(Math.random()*wishes.length); }
+  while(i === lastWish && wishes.length > 1);
+  lastWish = i;
+  oracleText.style.opacity = 0;
+  setTimeout(()=>{
+    oracleText.textContent = wishes[i];
+    oracleText.style.transition='opacity .3s';
+    oracleText.style.opacity = 1;
+  },150);
+  burstConfetti(30);
+});
+
+/* ============================================================
+   ОБРАТНЫЙ ОТСЧЁТ ДО ДНЯ РОЖДЕНИЯ
+   ⚠️ ЗАМЕНИ ДЕНЬ И МЕСЯЦ НА ДАТУ РОЖДЕНИЯ ПОДРУГИ
+   ============================================================ */
+const BIRTHDAY_MONTH = 12;   // 1–12  (например, 6 = июнь)
+const BIRTHDAY_DAY   = 5;  // 1–31
+
+function getNextBirthday(){
+  const now = new Date();
+  let year = now.getFullYear();
+  let bd = new Date(year, BIRTHDAY_MONTH - 1, BIRTHDAY_DAY, 0, 0, 0);
+  if(bd - now < 0){
+    bd = new Date(year + 1, BIRTHDAY_MONTH - 1, BIRTHDAY_DAY, 0, 0, 0);
+  }
+  return bd;
+}
+
+function tickBirthday(){
+  const now = new Date();
+  const bd  = getNextBirthday();
+  const diff = Math.max(0, bd - now);
+  const sec   = Math.floor(diff/1000);
+  const days  = Math.floor(sec/86400);
+  const hours = Math.floor((sec%86400)/3600);
+  const min   = Math.floor((sec%3600)/60);
+  const s     = sec%60;
+
+  document.getElementById('bDays').textContent  = days;
+  document.getElementById('bHours').textContent = String(hours).padStart(2,'0');
+  document.getElementById('bMin').textContent   = String(min).padStart(2,'0');
+  document.getElementById('bSec').textContent   = String(s).padStart(2,'0');
+
+  const msgEl = document.getElementById('bdayMessage');
+  const today = now.getMonth() === BIRTHDAY_MONTH - 1 && now.getDate() === BIRTHDAY_DAY;
+  if(today){
+    msgEl.textContent = '🎉 Сегодня твой день! С днём рождения! 🎂';
+  }else if(days === 0){
+    msgEl.textContent = '⏳ Уже совсем скоро — считанные часы! 🎈';
+  }else if(days <= 7){
+    msgEl.textContent = '🎁 Осталось меньше недели! Уже готовлю подарок 😉';
+  }else if(days <= 30){
+    msgEl.textContent = `🌸 Уже через ${days} дней — твой праздник!`;
+  }else{
+    msgEl.textContent = '✨ Каждый день приближает твой праздник!';
+  }
+}
+tickBirthday();
+setInterval(tickBirthday, 1000);
+/* ============================================================
+   11) КОНФЕТТИ
+   ============================================================ */
+const canvas = document.getElementById('confettiCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let confettiRAF = null;
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const COLORS = ['#ff9f1c','#5bc0eb','#7ac74f','#ffd23f','#ff6b9d','#9b5de5'];
+
+function burstConfetti(count=120){
+  for(let i=0;i<count;i++){
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: -20 - Math.random()*canvas.height*0.3,
+      vx: (Math.random()-0.5)*4,
+      vy: 2 + Math.random()*4,
+      size: 4 + Math.random()*8,
+      color: COLORS[Math.floor(Math.random()*COLORS.length)],
+      rot: Math.random()*Math.PI*2,
+      vr: (Math.random()-0.5)*0.3,
+      shape: Math.random()<0.5 ? 'rect' : 'circle',
+      life: 0,
+    });
+  }
+  if(!confettiRAF) loopConfetti();
+}
+
+function loopConfetti(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy; p.vy += 0.08; p.vx *= 0.995; p.rot += p.vr; p.life++;
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rot);
+    ctx.fillStyle = p.color;
+    if(p.shape==='rect'){ ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6); }
+    else{ ctx.beginPath(); ctx.arc(0,0,p.size/2,0,Math.PI*2); ctx.fill(); }
+    ctx.restore();
+    if(p.y > canvas.height + 40 || p.life > 600){ particles.splice(i,1); }
+  }
+  if(particles.length > 0){ confettiRAF = requestAnimationFrame(loopConfetti); }
+  else { cancelAnimationFrame(confettiRAF); confettiRAF = null; ctx.clearRect(0,0,canvas.width,canvas.height); }
+}
+
+/* ============================================================
+   12) ФИНАЛЬНАЯ КНОПКА
+   ============================================================ */
+document.getElementById('celebrateBtn').addEventListener('click', ()=>{
+  burstConfetti(200);
+  setTimeout(()=>burstConfetti(150), 400);
+  setTimeout(()=>burstConfetti(120), 900);
+  showToast('Желание загадано! ✨ Пусть обязательно сбудется!');
+});
+
+/* ============================================================
+   13) ТОСТ
+   ============================================================ */
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function showToast(text, ms=3200){
+  toastEl.textContent = text;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toastEl.classList.remove('show'), ms);
+}
+
+/* ============================================================
+   14) МУЗЫКА
+   Автовоспроизведение заблокировано браузерами — нужна кнопка.
+   ============================================================ */
+const musicBtn = document.getElementById('musicBtn');
+const bgMusic = document.getElementById('bgMusic');
+let musicPlaying = false;
+
+musicBtn.addEventListener('click', ()=>{
+  if(!musicPlaying){
+    bgMusic.volume = 0.35;
+    bgMusic.play().then(()=>{
+      musicPlaying = true;
+      musicBtn.classList.add('playing');
+      musicBtn.textContent = '🔊';
+    }).catch(()=>{
+      showToast('Не удалось включить музыку. Проверь, что файл music.mp3 лежит рядом с index.html 🎵');
+    });
+  }else{
+    bgMusic.pause();
+    musicPlaying = false;
+    musicBtn.classList.remove('playing');
+    musicBtn.textContent = '🎵';
+  }
+});
+
+// попытка автозапуска при первом клике в любом месте
+document.body.addEventListener('click', function firstClick(){
+  if(!musicPlaying){
+    bgMusic.volume = 0.35;
+    bgMusic.play().then(()=>{
+      musicPlaying = true;
+      musicBtn.classList.add('playing');
+      musicBtn.textContent = '🔊';
+    }).catch(()=>{});
+  }
+  document.body.removeEventListener('click', firstClick);
+}, {once:true});
+
+/* ============================================================
+   15) ПАСХАЛКИ
+   ============================================================ */
+const konami = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let konamiIdx = 0;
+document.addEventListener('keydown', e=>{
+  if(e.key === konami[konamiIdx]){
+    konamiIdx++;
+    if(konamiIdx === konami.length){
+      konamiIdx = 0;
+      burstConfetti(250);
+      openModal('🥚','Секретное яйцо!','Ты нашла пасхалку! 🎉 Знай: ты — самый крутой человек, которого я знаю. Спасибо, что ты рядом уже столько лет. 💛');
+    }
+  }else{ konamiIdx = 0; }
+});
+
+let logoClicks = 0, logoTimer = null;
+document.getElementById('logo').addEventListener('click', ()=>{
+  logoClicks++;
+  clearTimeout(logoTimer);
+  logoTimer = setTimeout(()=>logoClicks=0, 1200);
+  if(logoClicks >= 5){
+    logoClicks = 0;
+    burstConfetti(150);
+    openModal('🌟','Ещё один секрет!','Ты слишком любопытная — и это прекрасно! Пусть в твоей жизни будет как можно больше открытий. 🔍');
+  }
+});
+</script>
+</body>
+</html>
