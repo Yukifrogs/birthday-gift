@@ -273,20 +273,15 @@
   </section>
 
   <!-- ГОСТЕВАЯ -->
-  <section id="guestbook-section">
-    <h2 class="section-title">Гостевая книга поздравлений</h2>
-    <div class="guestbook">
-      <div class="row">
-        <input type="text" id="gbName" placeholder="Твоё имя" maxlength="40" />
-      </div>
-      <div class="row">
-        <textarea id="gbText" placeholder="Напиши поздравление для именинницы..." maxlength="500"></textarea>
-      </div>
-      <button class="btn green small" id="gbSubmit">Отправить поздравление 💌</button>
-      
-      <div class="entries" id="gbEntries"></div>
-    </div>
-  </section>
+<section id="guestbook-section">
+  <h2 class="section-title">Гостевая книга поздравлений</h2>
+  <div class="guestbook">
+    <p style="text-align:center;color:#7a3fd1;font-weight:700;margin-bottom:18px;">
+      Друзья уже оставили для тебя тёплые слова 💛
+    </p>
+    <div class="entries" id="gbEntries" style="max-height:none;overflow:visible;"></div>
+  </div>
+</section>
 
   <!-- ГЕНЕРАТОР -->
   <section id="oracle-section">
@@ -336,7 +331,7 @@
 <button class="music-btn" id="musicBtn" title="Включить/выключить музыку">🎵</button>
 <audio id="bgMusic" loop preload="auto">
   <!-- ЗАМЕНИ src НА СВОЙ ФАЙЛ: положи music.mp3 рядом с index.html -->
-  <source src="music.mp3" type="audio/mpeg">
+  <source src="скамейка.mp3" type="audio/mpeg">
 </audio>
 
 <canvas id="confettiCanvas"></canvas>
@@ -648,16 +643,16 @@ renderQuestion();
    7) ГАЛЕРЕЯ
    ============================================================ */
 const galleryItems = [
-  {img:'img/1.jpg', cap:'первый день'}, {emoji:'🍕', cap:'наша пицца'},
-  {emoji:'🌊', cap:'море'}, {emoji:'🎬', cap:'кино до утра'},
-  {emoji:'🎂', cap:'прошлый ДР'}, {emoji:'🎧', cap:'одна музыка'},
-  {emoji:'🌙', cap:'ночные разговоры'}, {emoji:'☕', cap:'кофе и болтовня'},
-  {emoji:'🧣', cap:'зима'}, {emoji:'🌸', cap:'весна'},
-  {emoji:'🏔️', cap:'поездка'}, {emoji:'📸', cap:'фото без повода'},
-  {emoji:'🎮', cap:'игры'}, {emoji:'🍰', cap:'тортики'},
-  {emoji:'👗', cap:'шопинг'}, {emoji:'🎤', cap:'караоке'},
-  {emoji:'🌟', cap:'мечты'}, {emoji:'💌', cap:'переписки'},
-  {emoji:'🤍', cap:'просто мы'}, {emoji:'🥳', cap:'20 лет!'},
+  {img:'img/анядр.jpg', cap:'Аня дневальный'}, {img:'img/эскобар.jpg', cap:'Пабло Эскобар'},
+  {img:'img/посиделки.jpg', cap:'посиделки'}, {img:'img/звонок.jpg', cap:'последний звонок'},
+  {img:'img/гулянка.jpg', cap:'гулянка'}, {img:'img/туалет.jpg', cap:'в туалете'},
+  {img:'img/зависаем.jpg', cap:'зависаем'}, {img:'img/упс.jpg', cap:'упс'},
+  {img:'img/детство.jpg', cap:'детство'}, {img:'img/красотки.jpg', cap:'красотки'},
+  {img:'img/поездка в карагай.jpg', cap:'поездка в карагай'}, {img:'img/электричка.jpg', cap:'#электричка'},
+  {img:'img/деньгорода.jpg', cap:'день города'}, {img:'img/девочки.jpg', cap:'девочки'},
+  {img:'img/сонвавтобусе.jpg', cap:'сон в автобусе'}, {img:'img/мы.jpg', cap:'селфи'},
+  {img:'img/прошлыйдр.jpg', cap:'прошлый др'}, {img:'img/драртёма.jpg', cap:'др артёма'},
+  {img:'img/вечеринкаосд.jpg', cap:'вечеринка осд'}, {img:'img/кино.jpg', cap:'кино'},
 ];
 
 const galleryEl = document.getElementById('gallery');
@@ -677,62 +672,99 @@ galleryItems.forEach(item=>{
 });
 
 /* ============================================================
-   8) ГОСТЕВАЯ КНИГА (localStorage)
-   ДЛЯ ОБЩЕГО ДОСТУПА: замени на Firebase Firestore.
-   Инструкция: https://firebase.google.com/codelabs/firebase-get-to-know-web
+   8) ГОСТЕВАЯ КНИГА — ЗАРАНЕЕ ГОТОВЫЕ ПОЗДРАВЛЕНИЯ
    ============================================================ */
-const GB_KEY = 'smeshariki_guestbook_v1';
-const gbEntries = document.getElementById('gbEntries');
-const gbName = document.getElementById('gbName');
-const gbText = document.getElementById('gbText');
-const gbSubmit = document.getElementById('gbSubmit');
-
-function loadGuestbook(){
-  const raw = localStorage.getItem(GB_KEY);
-  let list = [];
-  try { list = raw ? JSON.parse(raw) : []; } catch(e){ list = []; }
-  return list;
-}
-function saveGuestbook(list){
-  localStorage.setItem(GB_KEY, JSON.stringify(list));
-}
-function renderGuestbook(){
-  const list = loadGuestbook();
-  if(list.length === 0){
-    gbEntries.innerHTML = '<p style="color:#aab;text-align:center;font-size:.9rem;">Пока никто не поздравил. Будь первой! 💛</p>';
-    return;
+const congrats = [
+  {
+    type: 'video',
+    who: 'Кирилл',
+    when: 'старый друг',
+    video: 'img/video-1.mp4',
+    text: 'Аня Хазейнберг с днём рождения!'
+  },
+  {
+    type: 'text',
+    who: 'Ульяна',
+    when: 'систер',
+    text: 'Анюта, поздравляю тебя с днем рождения, ты невероятная и безумно светлая девушка. 20 лет — начало, начало более светлого будущего. Пусть дорогу жизни освещают тысячи звезд, и ни одна не гаснет. Люблю💛'
+  },
+  {
+    type: 'photos',
+    who: 'Аня',
+    when: 'друзья со школы',
+    photos: ['img/photo-3a.jpg', 'img/photo-3b.jpg'],
+    text: ''
+  },
+  {
+    type: 'text',
+    who: 'Даша',
+    when: 'Гордина',
+    text: 'Дорогая Аня, поздравляю тебя с днём рождения! Хочу пожелать тебе, чтобы каждый твой день начинался с улыбки, а заканчивался приятной усталостью от насыщенной жизни. Пусть рядом всегда будут люди, которые тебя ценят и любят, а все невзгоды обходят стороной. Оставайся такой же искренней, яркой и неповторимой!'
+  },
+  {
+    type: 'text',
+    who: 'Данил',
+    when: 'спортсмен',
+    text: 'Поздравляю с днём рождения! Оставайся такой же настоящей и классной. Пусть всё складывается по-твоему, а поводов для улыбки будет больше, чем проблем. 😎✌️'
+  },
+  {
+    type: 'photo-text',
+    who: 'Снежа',
+    when: 'подруга с детства',
+    photo: 'img/photo-6.jpg',
+    text: '20 лет — это тот возраст, когда уже понимаешь, кто ты, но ещё можно всё изменить. Мне повезло наблюдать, как ты растёшь, и я точно знаю: ты справишься с чем угодно. Спасибо, что ты есть — за смех до слёз, за ночные разговоры и за то, что ты всегда рядом, когда нужно. Пусть в этом году сбудется то, о чём ты молчишь. Пусть будет больше спонтанных «да», меньше «надо» и как можно больше поводов для счастья. Ты этого достойна. 💛 С любовью, твой Бараш)'
   }
+];
+
+const gbEntries = document.getElementById('gbEntries');
+
+function renderGuestbookStatic(){
   gbEntries.innerHTML = '';
-  list.forEach(item=>{
+  congrats.forEach(item => {
     const d = document.createElement('div');
     d.className = 'entry';
-    const date = new Date(item.ts).toLocaleString('ru-RU', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
-    d.innerHTML = `<div class="who">${escapeHtml(item.name)}<span class="when">${date}</span></div>
-                   <div class="txt">${escapeHtml(item.text)}</div>`;
+    d.style.padding = '18px 20px';
+
+    let mediaHtml = '';
+
+    if (item.type === 'video') {
+      mediaHtml = `
+        <video controls playsinline preload="metadata"
+          style="width:100%;border-radius:16px;margin-bottom:12px;box-shadow:0 6px 16px rgba(0,0,0,.12);background:#000;">
+          <source src="${item.video}" type="video/mp4">
+          Твой браузер не поддерживает видео.
+        </video>`;
+    } else if (item.type === 'photos') {
+      mediaHtml = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+          ${item.photos.map(src => `
+            <img src="${src}" alt="фото" loading="lazy"
+              style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:14px;box-shadow:0 4px 12px rgba(0,0,0,.1);">
+          `).join('')}
+        </div>`;
+    } else if (item.type === 'photo-text') {
+      mediaHtml = `
+        <img src="${item.photo}" alt="фото" loading="lazy"
+          style="width:100%;max-height:320px;object-fit:cover;border-radius:16px;margin-bottom:12px;box-shadow:0 6px 16px rgba(0,0,0,.1);">`;
+    }
+
+    d.innerHTML = `
+      <div class="who" style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+        ${escapeHtml(item.who)}
+        <span class="when">${escapeHtml(item.when)}</span>
+      </div>
+      ${mediaHtml}
+      <div class="txt">${escapeHtml(item.text)}</div>
+    `;
     gbEntries.appendChild(d);
   });
 }
+
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-gbSubmit.addEventListener('click', ()=>{
-  const name = gbName.value.trim();
-  const text = gbText.value.trim();
-  if(!name || !text){
-    showToast('Заполни имя и поздравление 🙏');
-    return;
-  }
-  const list = loadGuestbook();
-  list.unshift({ name, text, ts: Date.now() });
-  saveGuestbook(list);
-  gbName.value = '';
-  gbText.value = '';
-  renderGuestbook();
-  burstConfetti(40);
-  showToast('Поздравление добавлено! 💌');
-});
-renderGuestbook();
+renderGuestbookStatic();
 
 /* ============================================================
    9) ГЕНЕРАТОР ПОЖЕЛАНИЙ
